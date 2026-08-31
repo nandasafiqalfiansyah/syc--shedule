@@ -1,0 +1,28 @@
+name: Daily sync
+
+on:
+  schedule:
+    # Runs once per day at 00:17 UTC.
+    - cron: '17 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update activity marker
+        run: ./scripts/update-activity-marker.sh
+
+      - name: Commit activity marker
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore: daily activity sync'
+          file_pattern: data/activity-marker.json
